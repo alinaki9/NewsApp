@@ -1,64 +1,101 @@
 package com.example.newsapp;
-
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link Fragment1#newInstance} factory method to
- * create an instance of this fragment.
- */
-public class Fragment1 extends Fragment {
+import android.widget.ImageView;
+import android.widget.TextView;
+import com.squareup.picasso.Picasso;
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+public class Fragment1 extends Fragment implements View.OnClickListener{
+
+    private TextView headline;
+    private TextView body_view;
+    private ImageView image;
+    private View rootView;
+    BroadcastReceiver updateUIReciver;
 
     public Fragment1() {
-        // Required empty public constructor
+        super(R.layout.fragment_1);
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment Fragment1.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static Fragment1 newInstance(String param1, String param2) {
-        Fragment1 fragment = new Fragment1();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
+
+        SharedPreferences mSharedPreference= getActivity().getSharedPreferences("YO", Context.MODE_PRIVATE);
+        String listen1 = mSharedPreference.getString("title", "");
+
+        IntentFilter filter = new IntentFilter();
+
+        filter.addAction("com.hello.action");
+
+        updateUIReciver = new BroadcastReceiver() {
+
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                //UI update here
+                SharedPreferences mSharedPreference= getContext().getSharedPreferences("YO", Context.MODE_PRIVATE);
+
+                String title = mSharedPreference.getString("title", "");
+                String body = mSharedPreference.getString("body", "");
+                String image_url = mSharedPreference.getString("image-url", "");
+
+                headline = getView().findViewById(R.id.headline1);
+                headline.setText(title);
+
+                body_view = getView().findViewById(R.id.title1);
+                body_view.setText(body);
+
+                image = getView().findViewById(R.id.imageView);
+
+                Picasso.with(getContext())
+                        .load(image_url)
+                        .into(image);
+
+
+            }
+        };
+        getContext().registerReceiver(updateUIReciver,filter);
+
+
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_1, container, false);
+        rootView = inflater.inflate(R.layout.fragment_1, container, false);
+        headline = rootView.findViewById(R.id.headline1);
+        body_view = rootView.findViewById(R.id.title1);
+        image = rootView.findViewById(R.id.imageView);
+
+        return rootView;
     }
+
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+
+    }
+
+    @Override
+    public void onClick(View view) {
+
+
+    }
+
+
 }
